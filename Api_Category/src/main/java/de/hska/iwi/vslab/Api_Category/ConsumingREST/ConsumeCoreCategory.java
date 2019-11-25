@@ -7,26 +7,55 @@ import org.springframework.web.client.RestTemplate;
 
 public class ConsumeCoreCategory {
 
-    private String urlCoreCategory = "http://localhost:8082/category";
-    
+    //private String urlCoreCategory = "http://localhost:8082/category";
+
+    private static final Logger log = LoggerFactory.getLogger(ConsumeCoreCategory.class);
     RestTemplate restTemplate = new RestTemplate();
 
     public Category[] getCategories() {
-        Category [] categories = restTemplate.getForObject(urlCoreCategory, Category[].class);
-        return categories;
+        try {
+            UrlBuilder urlBuilder = new UrlBuilder();
+            log.info("URL:" + urlBuilder.getCategoryUrl());
+            Category [] categories = restTemplate.getForObject(urlBuilder.getCategoryUrl(), Category[].class);
+            return categories;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw e;
+        }
     }
 
     public Category getCategory(int id) {
-        Category category = restTemplate.getForObject(urlCoreCategory + "/" + id, Category.class);
-        return category;
+        try {
+            UrlBuilder urlBuilder = new UrlBuilder();
+            log.info("URL:" + urlBuilder.getCategoryUrl_withId(id));
+            Category category = restTemplate.getForObject(urlBuilder.getCategoryUrl_withId(id), Category.class);
+            return category;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw e;
+        }
     }
 
     public void addCategory(Category category) {
-        restTemplate.postForLocation(urlCoreCategory, category);
+        try {
+            UrlBuilder urlBuilder = new UrlBuilder();
+            log.info("URL:" + urlBuilder.getCategoryUrl());
+            restTemplate.postForLocation(urlBuilder.getCategoryUrl(), category);
+        } catch (Exception e) {
+            System.out.println(e);
+            throw e;
+        }
     }
 
     public void updateCategory(Category category) {
-        restTemplate.put(urlCoreCategory, category);
+        try {
+            UrlBuilder urlBuilder = new UrlBuilder();
+            log.info("URL:" + urlBuilder.getCategoryUrl());
+            restTemplate.put(urlBuilder.getCategoryUrl(), category);
+        } catch (Exception e) {
+            System.out.println(e);
+            throw e;
+        }
     }
 
 }
