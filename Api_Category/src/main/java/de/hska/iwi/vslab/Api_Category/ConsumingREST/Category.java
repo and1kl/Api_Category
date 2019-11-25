@@ -13,6 +13,10 @@ public class Category {
         this.name = name;
     }
 
+    public Category(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "{ id=" + id + ", name=" + name + " }";
@@ -24,6 +28,7 @@ public class Category {
     public int getId() {
         return id;
     }
+
     /**
      * @return the name
      */

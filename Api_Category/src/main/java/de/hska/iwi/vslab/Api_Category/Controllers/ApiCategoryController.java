@@ -14,36 +14,36 @@ public class ApiCategoryController {
     @Autowired
     private ApiCategoryService apiCategoryService;
 
-	private static final Logger log = LoggerFactory.getLogger(ApiCategoryController.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiCategoryController.class);
 
-    @PostMapping("/category")
-    public void addCategory(@RequestBody String name) { 
-        log.info("addProduct(name) was called");
+    @PostMapping(path = "/category", consumes = "application/json")
+    public void addCategory(@RequestBody String name) {
+        log.info("addCategory(name) was called");
         apiCategoryService.postCategory(name);
     }
 
     /**
-     * Delete a category and all products that were in that category. 
+     * Delete a category and all products that were in that category.
      */
     @DeleteMapping("/category/{id}")
-    public void deleteCategory(@PathVariable int id){
+    public void deleteCategory(@PathVariable int id) {
         log.info("deleteCategory(id) was called");
         apiCategoryService.deleteCategory(id);
     }
 
-    @GetMapping("/category") 
+    @GetMapping("/category")
     public Category[] getCategories() {
         log.info("getCategoires() was called");
         return apiCategoryService.getCategories();
     }
 
-    @GetMapping ("/category/{id}")
+    @GetMapping("/category/{id}")
     public Category getCategory(@PathVariable int id) {
         log.info("getCategory(id) was called");
         return apiCategoryService.getCategory(id);
     }
 
-    @PutMapping("/category/{id}")
+    @PutMapping(path = "/category/{id}", consumes = "application/json")
     public void updateCategory(@PathVariable int id, @RequestBody String name) {
         log.info("updateCategory(int id, String name) was called");
         apiCategoryService.updateCategory(id, name);

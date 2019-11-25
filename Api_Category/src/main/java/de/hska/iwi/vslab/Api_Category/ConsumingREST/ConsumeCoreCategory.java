@@ -4,10 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
-
 public class ConsumeCoreCategory {
 
-    //private String urlCoreCategory = "http://localhost:8082/category";
+    // private String urlCoreCategory = "http://localhost:8082/category";
 
     private static final Logger log = LoggerFactory.getLogger(ConsumeCoreCategory.class);
     RestTemplate restTemplate = new RestTemplate();
@@ -16,7 +15,7 @@ public class ConsumeCoreCategory {
         try {
             UrlBuilder urlBuilder = new UrlBuilder();
             log.info("URL:" + urlBuilder.getCategoryUrl());
-            Category [] categories = restTemplate.getForObject(urlBuilder.getCategoryUrl(), Category[].class);
+            Category[] categories = restTemplate.getForObject(urlBuilder.getCategoryUrl(), Category[].class);
             return categories;
         } catch (Exception e) {
             System.out.println(e);
