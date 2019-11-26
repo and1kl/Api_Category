@@ -6,7 +6,7 @@ import de.hska.iwi.vslab.Api_Category.ConsumingREST.Category;
 import de.hska.iwi.vslab.Api_Category.ConsumingREST.ConsumeCompProductCategory;
 import de.hska.iwi.vslab.Api_Category.ConsumingREST.ConsumeCoreCategory;
 
-/** 
+/**
  * The implementation of the service.
  */
 @Service
@@ -14,10 +14,10 @@ public class ApiCategoryService {
 
     ConsumeCompProductCategory compProductCategory = new ConsumeCompProductCategory();
 
-    public void deleteCategory(int id){
+    public void deleteCategory(int id) {
         compProductCategory.deleteCategory(id);
     }
-    
+
     ConsumeCoreCategory coreCategory = new ConsumeCoreCategory();
 
     public Category getCategory(int id) {
@@ -33,9 +33,8 @@ public class ApiCategoryService {
     }
 
     public void updateCategory(int id, String name) {
-        Category cat = coreCategory.getCategory(id);
-        cat.setName(name);
+        Category cat = new Category(id, name);
         coreCategory.updateCategory(cat);
     }
-    
+
 }

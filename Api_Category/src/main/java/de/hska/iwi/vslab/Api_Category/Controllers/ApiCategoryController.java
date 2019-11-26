@@ -17,9 +17,9 @@ public class ApiCategoryController {
     private static final Logger log = LoggerFactory.getLogger(ApiCategoryController.class);
 
     @PostMapping(path = "/category", consumes = "application/json")
-    public void addCategory(@RequestBody String name) {
+    public void addCategory(@RequestBody(required = true) Category request) {
         log.info("addCategory(name) was called");
-        apiCategoryService.postCategory(name);
+        apiCategoryService.postCategory(request.getName());
     }
 
     /**
@@ -44,9 +44,9 @@ public class ApiCategoryController {
     }
 
     @PutMapping(path = "/category/{id}", consumes = "application/json")
-    public void updateCategory(@PathVariable int id, @RequestBody String name) {
+    public void updateCategory(@PathVariable int id, @RequestBody(required = true) Category request) {
         log.info("updateCategory(int id, String name) was called");
-        apiCategoryService.updateCategory(id, name);
+        apiCategoryService.updateCategory(request.getId(), request.getName());
     }
 
 }

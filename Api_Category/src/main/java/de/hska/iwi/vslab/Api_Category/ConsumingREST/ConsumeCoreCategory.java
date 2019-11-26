@@ -49,8 +49,8 @@ public class ConsumeCoreCategory {
     public void updateCategory(Category category) {
         try {
             UrlBuilder urlBuilder = new UrlBuilder();
-            log.info("URL:" + urlBuilder.getCategoryUrl());
-            restTemplate.put(urlBuilder.getCategoryUrl(), category);
+            log.info("URL:" + urlBuilder.getCategoryUrl_withId(category.getId()));
+            restTemplate.put(urlBuilder.getCategoryUrl_withId(category.getId()), category);
         } catch (Exception e) {
             System.out.println(e);
             throw e;
