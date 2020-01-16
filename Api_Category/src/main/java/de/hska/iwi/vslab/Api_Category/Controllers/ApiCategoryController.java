@@ -20,17 +20,21 @@ public class ApiCategoryController {
     private static final Logger log = LoggerFactory.getLogger(ApiCategoryController.class);
 
     @PostMapping(path = "/category", consumes = "application/json")
-    @HystrixCommand(fallbackMethod = "defaultFallback")
+    //@HystrixCommand(fallbackMethod = "fallbackAddCategory")
     public void addCategory(@RequestBody(required = true) Category request) {
         log.info("addCategory(name) was called");
         apiCategoryService.postCategory(request.getName());
+    }
+
+    public void fallbackAddCategory(Category category, Throwable throwable) {
+        System.out.printf("DefaultFallback, exception=%s%n", throwable);
     }
 
     /**
      * Delete a category and all products that were in that category.
      */
     @DeleteMapping("/category/{id}")
-    @HystrixCommand(fallbackMethod = "defaultFallbackWithId")
+    //@HystrixCommand(fallbackMethod = "defaultFallbackWithId")
     public void deleteCategory(@PathVariable int id) {
         log.info("deleteCategory(id) was called");
         apiCategoryService.deleteCategory(id);
@@ -53,7 +57,7 @@ public class ApiCategoryController {
     }
 
     @GetMapping("/category/{id}")
-    @HystrixCommand(fallbackMethod = "fallbackGetCategory")
+    //@HystrixCommand(fallbackMethod = "fallbackGetCategory")
     public Category getCategory(@PathVariable int id) {
         log.info("getCategory(id) was called");
         return apiCategoryService.getCategory(id);
@@ -65,7 +69,7 @@ public class ApiCategoryController {
     }
 
     @PutMapping(path = "/category/{id}", consumes = "application/json")
-    @HystrixCommand(fallbackMethod = "defaultFallbackWithId")
+    //@HystrixCommand(fallbackMethod = "defaultFallbackWithId")
     public void updateCategory(@PathVariable int id, @RequestBody(required = true) Category request) {
         log.info("updateCategory(int id, String name) was called");
         apiCategoryService.updateCategory(request.getId(), request.getName());
