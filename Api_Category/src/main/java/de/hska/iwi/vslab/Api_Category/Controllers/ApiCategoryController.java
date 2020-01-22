@@ -1,6 +1,7 @@
 package de.hska.iwi.vslab.Api_Category.Controllers;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import de.hska.iwi.vslab.Api_Category.ConsumingREST.Category;
 import de.hska.iwi.vslab.Api_Category.Services.ApiCategoryService;
 
@@ -10,77 +11,82 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 @RestController
 @EnableCircuitBreaker
 public class ApiCategoryController {
-
+    private final Map<Integer, Category> categoryCache = new LinkedHashMap<Integer, Category>();
     @Autowired
     private ApiCategoryService apiCategoryService;
 
     private static final Logger log = LoggerFactory.getLogger(ApiCategoryController.class);
 
     @PostMapping(path = "/category", consumes = "application/json")
-    //@HystrixCommand(fallbackMethod = "fallbackAddCategory")
+    @HystrixCommand(fallbackMethod = "addCategoryFallback", commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2") })
     public void addCategory(@RequestBody(required = true) Category request) {
-        log.info("addCategory(name) was called");
         apiCategoryService.postCategory(request.getName());
     }
 
-    public void fallbackAddCategory(Category category, Throwable throwable) {
-        System.out.printf("DefaultFallback, exception=%s%n", throwable);
+    public void addCategoryFallback(Category payload, Throwable e) {
+        System.out.printf("Add Category Failed! name=%s, exception=%s%n ", payload.getName(), e);
     }
 
     /**
      * Delete a category and all products that were in that category.
      */
     @DeleteMapping("/category/{id}")
-    //@HystrixCommand(fallbackMethod = "defaultFallbackWithId")
+    @HystrixCommand(fallbackMethod = "deleteCategoryFallback", commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2") })
     public void deleteCategory(@PathVariable int id) {
-        log.info("deleteCategory(id) was called");
         apiCategoryService.deleteCategory(id);
     }
 
-    @GetMapping("/category")
-    @HystrixCommand(fallbackMethod = "fallbackGetCategories")
-    public Category[] getCategories() {
-        log.info("getCategoires() was called");
-        return apiCategoryService.getCategories();
+    public void deleteCategoryFallback(int id, Throwable throwable) {
+        System.out.printf("Delete category failed, id=%s, exception=%s%n", id, throwable);
     }
 
-    public Category[] fallbackGetCategories() {
-        Category category1 = new Category(1, "fallbackCategory1");
-        Category category2 = new Category(2, "fallbackCategory2");
-        Category[] categoryA = new Category[2];
-        categoryA[0] = category1;
-        categoryA[1] = category2;
-        return categoryA;
+    @GetMapping("/category")
+    @HystrixCommand(fallbackMethod = "getCategoriesCache", commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2") })
+    public Category[] getCategories() {
+        Category[] cats = apiCategoryService.getCategories();
+        for(Category cat : cats) {
+            categoryCache.putIfAbsent(cat.getId(), cat);
+        }
+        return cats;
+    }
+
+    public Category[] getCategoriesCache() {
+        Collection<Category> list = categoryCache.values();
+        Category[] cats = new Category[categoryCache.values().size()];
+        cats = list.toArray(cats);
+        return cats;
     }
 
     @GetMapping("/category/{id}")
-    //@HystrixCommand(fallbackMethod = "fallbackGetCategory")
+    @HystrixCommand(fallbackMethod = "getCategoryCache", commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2") })
     public Category getCategory(@PathVariable int id) {
-        log.info("getCategory(id) was called");
         return apiCategoryService.getCategory(id);
     }
 
-    public Category fallbackGetCategory() {
-        Category category = new Category(1, "fallbackCategory1");
-        return category;
+    public Category getCategoryCache(int id) {
+        return categoryCache.getOrDefault(id, new Category());
     }
 
     @PutMapping(path = "/category/{id}", consumes = "application/json")
-    //@HystrixCommand(fallbackMethod = "defaultFallbackWithId")
+    @HystrixCommand(fallbackMethod = "updateCategoryFallback", commandProperties = {
+            @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2") })
     public void updateCategory(@PathVariable int id, @RequestBody(required = true) Category request) {
-        log.info("updateCategory(int id, String name) was called");
         apiCategoryService.updateCategory(request.getId(), request.getName());
     }
 
-    public void defaultFallback(Throwable throwable) {
-        System.out.printf("DefaultFallback, exception=%s%n", throwable);
-    }
-
-    public void defaultFallbackWithId(int id, Throwable throwable) {
-        System.out.printf("DefaultFallbackWithId, id=%s, exception=%s%n", id, throwable);
+    public void updateCategoryFallback(int id, Category payload, Throwable e) {
+        System.out.printf("Update category Failed! id=%s, exception=%s%n ", id, e);
     }
 
 }
